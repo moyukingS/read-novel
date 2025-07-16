@@ -1,43 +1,51 @@
 <template>
-  <div class="flex items-center mb-4 p-5">
-    <span class="mr-2">每次加载章节数：</span>
-    <n-input-number v-model:value="store.batchSize" :min="1" :max="10" size="small" style="width: 80px;" />
-  </div>
-  <n-list>
-    <n-list-item v-for="novel in store.novels" :key="novel.name">
-      <div class="flex justify-between items-center">
-        <span @click="handleSelect(novel.name)" class="cursor-pointer">{{ novel.name }}</span>
-        <n-button size="small" type="error" @click="handleDelete(novel.name)">删除</n-button>
-      </div>
-    </n-list-item>
-  </n-list>
+  <n-menu
+    :options="menuOptions"
+    @update:value="handleSelect"
+    :render-label="renderLabel"
+  />
 </template>
 
 <script setup>
+import { h ,computed} from 'vue'
+import { NButton } from 'naive-ui'
 import { useNovelStore } from '@/stores/novel'
 const store = useNovelStore()
 
-async function handleSelect(name) {
-  await store.selectNovel(name)
+function handleSelect(name) {
+  store.selectNovel(name)
 }
 
-async function handleDelete(name) {
-  await store.removeNovel(name)
+function handleDelete(name, e) {
+  e.stopPropagation()
+  store.removeNovel(name)
+}
+
+const menuOptions = computed(() =>
+  store.novels.map(novel => ({
+    label: novel.name,
+    key: novel.name
+  }))
+)
+
+function renderLabel(option) {
+  return h(
+    'div',
+    { style: 'display: flex; justify-content: space-between; align-items: center;' },
+    [
+      h('span', { style: 'flex: 1; cursor: pointer;' }, option.label),
+      h(NButton, {
+        size: 'small',
+        type: 'error',
+        onClick: (e) => handleDelete(option.key, e)
+      }, { default: () => '删除' })
+    ]
+  )
 }
 </script>
 
 <style scoped>
 .novel-manager {
   padding: 1em;
-}
-.novel-manager ul {
-  list-style: none;
-  padding: 0;
-}
-.novel-manager li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5em;
 }
 </style> 

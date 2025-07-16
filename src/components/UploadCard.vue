@@ -1,7 +1,22 @@
 <template>
   <n-card title="上传小说">
-    <input type="file" accept=".txt" @change="handleUpload" :disabled="uploading" />
-    <n-spin v-if="uploading" size="small">上传中...</n-spin>
+    <input
+      ref="fileInput"
+      type="file"
+      accept=".txt"
+      @change="handleUpload"
+      :disabled="uploading"
+      style="display: none"
+    />
+    <n-button
+      type="primary"
+      @click="triggerUpload"
+      :loading="uploading"
+      :disabled="uploading"
+    >
+      选择文件上传
+    </n-button>
+    <n-spin v-if="uploading" size="small" class="ml-2">上传中...</n-spin>
   </n-card>
 </template>
 
@@ -11,6 +26,11 @@ import { useNovelStore } from '@/stores/novel'
 const store = useNovelStore()
 
 const uploading = ref(false)
+const fileInput = ref(null)
+
+function triggerUpload() {
+  fileInput.value && fileInput.value.click()
+}
 
 async function handleUpload(e) {
   const file = e.target.files[0]

@@ -27,13 +27,13 @@ onMounted(async () => {
   <n-config-provider :theme="store.isDark ? darkTheme : null">
     <n-layout class="min-h-screen" style="height: 100vh;" :native-scrollbar="false">
       <HeaderBar />
-      <n-drawer v-model:show="store.showManager" width="420" placement="right">
+      <n-drawer v-model:show="store.showManager" width="200" placement="right">
         <NovelManager class="mb-6" />
       </n-drawer>
-      <n-layout has-sider :native-scrollbar="false">
+      <n-layout has-sider :native-scrollbar="false" style="height: 100%;">
         <Sidebar />
-        <n-layout-content :native-scrollbar="false">
-          <div style="height: 100%;">
+        <n-layout-content :native-scrollbar="false" style="height: 100%;">
+          <div style="height: 100%; display: flex; flex-direction: column;">
             <UploadCard v-if="!store.uploaded" />
             <ReaderContent v-else />
           </div>

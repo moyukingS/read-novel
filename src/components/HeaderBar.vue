@@ -1,5 +1,5 @@
 <template>
-  <n-layout-header >
+  <n-layout-header>
     <n-space align="center" justify="space-between" class="w-full px-4 ">
       <div class="flex items-center" style="height: 45px;">
         <n-icon size="24">
@@ -15,7 +15,9 @@
           </n-icon>
         </n-button>
         <n-button quaternary circle @click="store.showManager = true">
-          管理
+          <n-icon>
+            <SettingsOutline />
+          </n-icon>
         </n-button>
       </div>
     </n-space>
@@ -25,7 +27,7 @@
 <script setup>
 import { useNovelStore } from '@/stores/novel'
 import { NButton, NSpace, NIcon } from 'naive-ui'
-import { MoonOutline, SunnyOutline, BookOutline } from '@vicons/ionicons5'
+import { MoonOutline, SunnyOutline, BookOutline, SettingsOutline } from '@vicons/ionicons5'
 
 const store = useNovelStore()
 </script>

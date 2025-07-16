@@ -21,9 +21,6 @@ export const useNovelStore = defineStore('novel', () => {
   const isSidebarCollapsed = ref(false)
   const novelProgress = reactive({})
   const lastReadNovelName = ref(null)
-  const batchSize = ref(3)
-  const currentLoadedChapters = ref([])
-  const loadedRange = ref({ start: 0, end: 0 })
 
   // 分页相关 computed
   const currentPageChapters = computed(() => {
@@ -149,77 +146,22 @@ export const useNovelStore = defineStore('novel', () => {
     }
   }
 
-  async function loadMoreChapters(direction = 'down') {
-    if (!currentNovel.value) return
-    if (direction === 'down') {
-      const nextStart = loadedRange.value.end
-      const nextEnd = Math.min(nextStart + batchSize.value, chaptersMeta.value.length)
-      for (let i = nextStart; i < nextEnd; i++) {
-        const content = await getChapterFromDB(currentNovel.value, i)
-        currentLoadedChapters.value.push({ ...chaptersMeta.value[i], content })
-      }
-      loadedRange.value.end = nextEnd
-    } else if (direction === 'up') {
-      const prevStart = Math.max(0, loadedRange.value.start - batchSize.value)
-      const inserts = []
-      for (let i = prevStart; i < loadedRange.value.start; i++) {
-        const content = await getChapterFromDB(currentNovel.value, i)
-        inserts.push({ ...chaptersMeta.value[i], content })
-      }
-      currentLoadedChapters.value = inserts.concat(currentLoadedChapters.value)
-      loadedRange.value.start = prevStart
-    }
-    trimLoadedChapters()
-  }
-
-  function resetLoadedChapters(centerIdx = 0) {
-    const start = Math.max(0, centerIdx - batchSize.value)
-    const end = Math.min(chaptersMeta.value.length, centerIdx + batchSize.value + 1)
-    loadedRange.value = { start, end }
-    currentLoadedChapters.value = []
-    for (let i = start; i < end; i++) {
-      getChapterFromDB(currentNovel.value, i).then(content => {
-        currentLoadedChapters.value[i - start] = { ...chaptersMeta.value[i], content }
-        trimLoadedChapters()
-      })
-    }
-    setCurrentChapterIndex(centerIdx)
-  }
-
-  function trimLoadedChapters() {
-    const N = 3
-    const start = Math.max(0, currentChapterIndex.value - N)
-    const end = Math.min(chaptersMeta.value.length, currentChapterIndex.value + batchSize.value + N)
-    const keepIndexes = []
-    for (let i = start; i < end; i++) keepIndexes.push(i)
-    currentLoadedChapters.value = currentLoadedChapters.value.filter(ch => keepIndexes.includes(ch.index))
-    loadedRange.value = { start, end }
-  }
-
-  const _originSetCurrentChapterIndex = setCurrentChapterIndex
-  function setCurrentChapterIndexWithTrim(idx) {
-    _originSetCurrentChapterIndex(idx)
-    trimLoadedChapters()
-  }
-
   return {
     // state
     isDark, novels, chaptersMeta, currentChapterContent, currentNovel, currentChapterIndex,
     uploaded, pageSize, currentPage, showManager, isSidebarCollapsed,
     novelProgress, lastReadNovelName,
-    batchSize, currentLoadedChapters, loadedRange,
     // computed
     currentPageChapters, totalPages,
     // actions
-    toggleTheme, setCurrentNovel, setCurrentChapterIndex: setCurrentChapterIndexWithTrim, toggleSidebarCollapsed, setNovelProgress, setLastReadNovelName,
+    toggleTheme, setCurrentNovel, setCurrentChapterIndex, toggleSidebarCollapsed, setNovelProgress, setLastReadNovelName,
     splitChapters,
     loadNovels,
     uploadNovel,
     loadChaptersMeta,
     loadChapterContent,
     selectNovel,
-    removeNovel,
-    loadMoreChapters, resetLoadedChapters, trimLoadedChapters
+    removeNovel
   }
 }, {
   persist: true,
