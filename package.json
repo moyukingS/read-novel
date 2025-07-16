@@ -1,0 +1,26 @@
+{
+  "name": "start",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "idb": "^8.0.3",
+    "naive-ui": "^2.42.0",
+    "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.4.1",
+    "vue": "^3.5.17"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "@vicons/ionicons5": "^0.13.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "tailwindcss": "^4.1.11",
+    "vfonts": "^0.0.3",
+    "vite": "^6.3.5"
+  }
+}
