@@ -48,17 +48,12 @@
 </template>
 
 <script setup>
-import { useNovelStore } from '@/stores/novel'
-import { NButton, NSpace, NIcon, NProgress, NInput, NInputGroup } from 'naive-ui'
-import { MoonOutline, SunnyOutline, BookOutline, SettingsOutline } from '@vicons/ionicons5'
-import { ref, watch } from 'vue'
-
+import { BookOutline,MoonOutline, SunnyOutline, SettingsOutline } from '@vicons/ionicons5'
 const store = useNovelStore()
 
 const editingName = ref(false)
 const editName = ref(store.currentNovel)
 
-// 保持 editName 与 store.currentNovel 同步
 watch(() => store.currentNovel, (val) => {
   if (!editingName.value) editName.value = val
 })
@@ -76,12 +71,4 @@ function cancelEdit() {
 </script>
 
 <style scoped>
-.header-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1em 2em;
-  background: #f5f5f5;
-  border-bottom: 1px solid #eee;
-}
 </style>

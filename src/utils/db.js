@@ -45,24 +45,21 @@ export async function deleteNovel(name) {
   await tx.done;
 }
 
-// 小说重命名（迁移所有相关数据）
+// 小说重命名
 export async function renameNovelInDB(oldName, newName) {
   const db = await dbPromise;
-  // 1. novels 表
   const novel = await db.get('novels', oldName);
   if (novel) {
     novel.name = newName;
     await db.put('novels', novel);
     await db.delete('novels', oldName);
   }
-  // 2. chaptersMeta 表
   const meta = await db.get('chaptersMeta', oldName);
   if (meta) {
     meta.novel = newName;
     await db.put('chaptersMeta', meta);
     await db.delete('chaptersMeta', oldName);
   }
-  // 3. chapterContent 表
   const tx = db.transaction('chapterContent', 'readwrite');
   const store = tx.objectStore('chapterContent');
   let cursor = await store.openCursor();

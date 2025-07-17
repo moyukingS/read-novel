@@ -130,7 +130,6 @@ export const useNovelStore = defineStore('novel', () => {
     uploaded.value = true
     await saveNovel({ name, lastRead: idx })
     currentPage.value = Math.floor(idx / pageSize.value) + 1
-    // showManager.value = false // 删除这行，不再自动关闭抽屉
   }
 
   // 删除小说

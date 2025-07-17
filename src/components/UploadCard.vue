@@ -21,8 +21,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useNovelStore } from '@/stores/novel'
+
 const store = useNovelStore()
 
 const uploading = ref(false)

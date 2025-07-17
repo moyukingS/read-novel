@@ -4,8 +4,7 @@
       @click="handleSelect(novel.name)">
       <div style="flex:1;" @dblclick.stop="handleEditStart(novel.name)">
         <template v-if="editingKey === novel.name">
-          <n-input v-model:value="editValue" size="small" @keydown.enter="handleEditSave(novel.name)"
-            @keydown.esc="handleEditCancel" />
+          <n-input v-model:value="editValue" size="small" @keydown="handleInputKeydown" />
         </template>
         <template v-else>
           {{ novel.name }}
@@ -61,6 +60,14 @@ function handleEditStart(name) {
     const input = document.querySelector('.novel-edit-input')
     if (input) input.focus()
   })
+}
+
+function handleInputKeydown(e) {
+  if (e.key === 'Enter') {
+    handleEditSave(editingKey.value)
+  } else if (e.key === 'Escape') {
+    handleEditCancel()
+  }
 }
 
 async function handleEditSave(name) {

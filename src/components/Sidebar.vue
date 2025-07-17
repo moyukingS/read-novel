@@ -17,7 +17,6 @@
 </template>
 
 <script setup>
-import { useNovelStore } from '@/stores/novel'
 const store = useNovelStore()
 
 function handleChapterClick(idx) {
@@ -26,10 +25,6 @@ function handleChapterClick(idx) {
 
 function handlePageChange(page) {
   store.currentPage = page
-}
-
-function toggleCollapse() {
-  store.toggleSidebarCollapsed()
 }
 </script>
 

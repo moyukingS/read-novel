@@ -1,24 +1,4 @@
-<script setup>
-import { onMounted } from 'vue'
-import { useNovelStore } from '@/stores/novel'
-const store = useNovelStore()
 
-function prevChapter() {
-  if (store.currentChapterIndex > 0) {
-    store.loadChapterContent(store.currentNovel, store.currentChapterIndex - 1)
-  }
-}
-function nextChapter() {
-  if (store.currentChapterIndex < store.chaptersMeta.length - 1) {
-    store.loadChapterContent(store.currentNovel, store.currentChapterIndex + 1)
-  }
-}
-onMounted(() => {
-  if (store.currentNovel && store.chaptersMeta.length) {
-    store.loadChapterContent(store.currentNovel, store.currentChapterIndex)
-  }
-})
-</script>
 
 <template>
   <div class="container mx-auto px-4">
@@ -38,7 +18,26 @@ onMounted(() => {
     </n-scrollbar>
   </div>
 </template>
+<script setup>
 
+const store = useNovelStore()
+
+function prevChapter() {
+  if (store.currentChapterIndex > 0) {
+    store.loadChapterContent(store.currentNovel, store.currentChapterIndex - 1)
+  }
+}
+function nextChapter() {
+  if (store.currentChapterIndex < store.chaptersMeta.length - 1) {
+    store.loadChapterContent(store.currentNovel, store.currentChapterIndex + 1)
+  }
+}
+onMounted(() => {
+  if (store.currentNovel && store.chaptersMeta.length) {
+    store.loadChapterContent(store.currentNovel, store.currentChapterIndex)
+  }
+})
+</script>
 <style scoped>
 
 .chapter-content {
