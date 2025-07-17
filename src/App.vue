@@ -1,12 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useNovelStore } from './stores/novel'
-import { darkTheme } from 'naive-ui'
-import HeaderBar from './components/HeaderBar.vue'
-import Sidebar from './components/Sidebar.vue'
-import UploadCard from './components/UploadCard.vue'
-import ReaderContent from './components/ReaderContent.vue'
-import NovelManager from './components/NovelManager.vue'
+
 
 const store = useNovelStore()
 
@@ -21,14 +14,36 @@ onMounted(async () => {
     await store.selectNovel(store.lastReadNovelName.value)
   }
 })
+
+// 自动设置网页 title
+watch(
+  () => [store.currentNovel, store.chaptersMeta, store.currentChapterIndex],
+  () => {
+    const novel = store.currentNovel || ''
+    const chapter = store.chaptersMeta?.[store.currentChapterIndex]?.title || ''
+    document.title = chapter ? `${novel} - ${chapter}` : novel
+  },
+  { immediate: true, deep: true }
+)
 </script>
 
 <template>
   <n-config-provider :theme="store.isDark ? darkTheme : null">
     <n-layout class="min-h-screen" style="height: 100vh;" :native-scrollbar="false">
       <HeaderBar />
-      <n-drawer v-model:show="store.showManager" width="200" placement="right">
-        <NovelManager class="mb-6" />
+      <n-drawer v-model:show="store.showManager" width="400" placement="right">
+
+        <n-drawer-content>
+          <template #header>
+            <h3>
+              小说管理
+            </h3>
+          </template>
+          <NovelManager class="mb-6" />
+          <template #footer>
+            <UploadCard />
+          </template>
+        </n-drawer-content>
       </n-drawer>
       <n-layout has-sider :native-scrollbar="false" style="height: 100%;">
         <Sidebar />

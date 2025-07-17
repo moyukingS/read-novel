@@ -3,7 +3,8 @@ import { ref, reactive, computed } from 'vue'
 import {
   saveNovel, getAllNovels, getNovel, deleteNovel,
   saveChaptersMetaToDB, getChaptersMetaFromDB,
-  saveChapterToDB, getChapterFromDB
+  saveChapterToDB, getChapterFromDB,
+  renameNovelInDB
 } from '@/utils/db'
 
 export const useNovelStore = defineStore('novel', () => {
@@ -129,7 +130,7 @@ export const useNovelStore = defineStore('novel', () => {
     uploaded.value = true
     await saveNovel({ name, lastRead: idx })
     currentPage.value = Math.floor(idx / pageSize.value) + 1
-    showManager.value = false
+    // showManager.value = false // 删除这行，不再自动关闭抽屉
   }
 
   // 删除小说
@@ -143,6 +144,32 @@ export const useNovelStore = defineStore('novel', () => {
       setCurrentChapterIndex(0)
       uploaded.value = false
       currentPage.value = 1
+    }
+  }
+
+  // 小说重命名
+  async function renameNovel(oldName, newName) {
+    if (!oldName || !newName || oldName === newName) return
+    await renameNovelInDB(oldName, newName)
+    // 更新 novels 列表
+    await loadNovels()
+    // novelProgress key
+    if (novelProgress[oldName] !== undefined) {
+      novelProgress[newName] = novelProgress[oldName]
+      delete novelProgress[oldName]
+    }
+    // currentNovel
+    if (currentNovel.value === oldName) {
+      currentNovel.value = newName
+    }
+    // lastReadNovelName
+    if (lastReadNovelName.value === oldName) {
+      lastReadNovelName.value = newName
+    }
+    // 如果当前已上传，刷新章节元数据和内容
+    if (uploaded.value && currentNovel.value === newName) {
+      await loadChaptersMeta(newName)
+      await loadChapterContent(newName, currentChapterIndex.value)
     }
   }
 
@@ -161,7 +188,8 @@ export const useNovelStore = defineStore('novel', () => {
     loadChaptersMeta,
     loadChapterContent,
     selectNovel,
-    removeNovel
+    removeNovel,
+    renameNovel
   }
 }, {
   persist: true,
