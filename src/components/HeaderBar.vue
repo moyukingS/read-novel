@@ -7,10 +7,10 @@
         </n-icon>
         <span class="ml-2 font-bold text-lg">read-novel</span>
       </div>
-      <div v-if="store.uploaded" class="flex items-center gap-4">
+      <div v-if="readerStore.uploaded" class="flex items-center gap-4">
         <div>
           <template v-if="!editingName">
-            <span style="font-weight:bold; cursor:pointer;" @click="editingName = true">{{ store.currentNovel }}</span>
+            <span style="font-weight:bold; cursor:pointer;" @click="editingName = true">{{ readerStore.currentNovel }}</span>
           </template>
           <template v-else>
             <n-input-group>
@@ -22,7 +22,7 @@
         </div>
         <n-progress
           type="circle"
-          :percentage="store.chaptersMeta.length ? ((store.currentChapterIndex + 1) / store.chaptersMeta.length) * 100 : 0"
+          :percentage="readerStore.chaptersMeta.length ? ((readerStore.currentChapterIndex + 1) / readerStore.chaptersMeta.length) * 100 : 0"
           :show-indicator="false"
           
           :stroke-width="8"
@@ -31,13 +31,13 @@
         </n-progress>
       </div>
       <div class="flex gap-4 items-center">
-        <n-button quaternary circle @click="store.toggleTheme">
+        <n-button quaternary circle @click="themeStore.toggleTheme">
           <n-icon>
-            <MoonOutline v-if="!store.isDark" />
+            <MoonOutline v-if="!themeStore.isDark" />
             <SunnyOutline v-else />
           </n-icon>
         </n-button>
-        <n-button quaternary circle @click="store.showManager = true">
+        <n-button quaternary circle @click="themeStore.showManager = true">
           <n-icon>
             <SettingsOutline />
           </n-icon>
@@ -48,24 +48,30 @@
 </template>
 
 <script setup>
-import { BookOutline,MoonOutline, SunnyOutline, SettingsOutline } from '@vicons/ionicons5'
-const store = useNovelStore()
+import { BookOutline, MoonOutline, SunnyOutline, SettingsOutline } from '@vicons/ionicons5'
+import { useThemeStore } from '@/stores/theme'
+import { useLibraryStore } from '@/stores/library'
+import { useReaderStore } from '@/stores/reader'
+
+const themeStore = useThemeStore()
+const libraryStore = useLibraryStore()
+const readerStore = useReaderStore()
 
 const editingName = ref(false)
-const editName = ref(store.currentNovel)
+const editName = ref(readerStore.currentNovel)
 
-watch(() => store.currentNovel, (val) => {
+watch(() => readerStore.currentNovel, (val) => {
   if (!editingName.value) editName.value = val
 })
 
 async function saveName() {
-  if (editName.value && editName.value !== store.currentNovel) {
-    await store.renameNovel(store.currentNovel, editName.value)
+  if (editName.value && editName.value !== readerStore.currentNovel) {
+    await libraryStore.renameNovel(readerStore.currentNovel, editName.value)
   }
   editingName.value = false
 }
 function cancelEdit() {
-  editName.value = store.currentNovel
+  editName.value = readerStore.currentNovel
   editingName.value = false
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <n-list bordered size="small">
-    <n-list-item v-for="novel in store.novels" :key="novel.name" class="flex justify-between cursor-pointer"
+    <n-list-item v-for="novel in libraryStore.novels" :key="novel.name" class="flex justify-between cursor-pointer"
       @click="handleSelect(novel.name)">
       <div style="flex:1;" @dblclick.stop="handleEditStart(novel.name)">
         <template v-if="editingKey === novel.name">
@@ -27,7 +27,7 @@
             <n-button quaternary circle size="small" type="error" @click.stop="handleDelete(novel.name, $event)">
               <IconIonTrashOutline />
             </n-button>
-            <n-button quaternary disabled type="success" circle size="small" v-if="novel.name === store.currentNovel">
+            <n-button quaternary disabled type="success" circle size="small" v-if="novel.name === readerStore.currentNovel">
               <IconIonCheckmarkCircleOutline />
             </n-button>
           </template>
@@ -38,28 +38,27 @@
 </template>
 
 <script setup>
-const store = useNovelStore()
+import { useLibraryStore } from '@/stores/library'
+import { useReaderStore } from '@/stores/reader'
+
+const libraryStore = useLibraryStore()
+const readerStore = useReaderStore()
 
 const editingKey = ref(null)
 const editValue = ref('')
-const saving = ref(false)
 
 function handleSelect(name) {
-  store.selectNovel(name)
+  readerStore.selectNovel(name)
 }
 
 function handleDelete(name, e) {
   e.stopPropagation()
-  store.removeNovel(name)
+  libraryStore.removeNovel(name)
 }
 
 function handleEditStart(name) {
   editingKey.value = name
   editValue.value = name
-  nextTick(() => {
-    const input = document.querySelector('.novel-edit-input')
-    if (input) input.focus()
-  })
 }
 
 function handleInputKeydown(e) {
@@ -71,21 +70,18 @@ function handleInputKeydown(e) {
 }
 
 async function handleEditSave(name) {
-  if (saving.value) return
-  saving.value = true
   const newName = editValue.value.trim()
   if (newName && newName !== name) {
-    await store.renameNovel(name, newName)
+    await libraryStore.renameNovel(name, newName)
+    if (readerStore.currentNovelKey === name) {
+      readerStore.currentNovelKey = newName
+    }
   }
   editingKey.value = null
-  editValue.value = ''
-  saving.value = false
 }
 
 function handleEditCancel() {
-  if (saving.value) return // 如果正在保存，不执行取消
   editingKey.value = null
-  editValue.value = ''
 }
 </script>
 

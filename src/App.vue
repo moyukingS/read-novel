@@ -1,8 +1,8 @@
 <template>
-  <n-config-provider :theme="store.isDark ? darkTheme : null">
+  <n-config-provider :theme="themeStore.isDark ? darkTheme : null">
     <n-layout :native-scrollbar="false" class="h-screen">
       <HeaderBar />
-      <n-drawer v-model:show="store.showManager" width="400" placement="right">
+      <n-drawer v-model:show="themeStore.showManager" width="400" placement="right">
         <n-drawer-content>
           <template #header>
             <h3>
@@ -19,7 +19,7 @@
         <Sidebar />
         <n-layout-content>
           <div style="height: 100%; display: flex; flex-direction: column;">
-            <UploadCard v-if="!store.uploaded" />
+            <UploadCard v-if="!readerStore.uploaded" />
             <ReaderContent v-else />
           </div>
         </n-layout-content>
@@ -29,26 +29,29 @@
 </template>
 <script setup>
 import { darkTheme } from 'naive-ui'
-const store = useNovelStore()
+
+const themeStore = useThemeStore()
+const libraryStore = useLibraryStore()
+const readerStore = useReaderStore()
 
 onMounted(async () => {
-  await store.loadNovels()
+  await libraryStore.loadNovels()
   if (
-    store.lastReadNovelName &&
-    typeof store.lastReadNovelName === 'object' &&
-    'value' in store.lastReadNovelName &&
-    store.lastReadNovelName.value
+    readerStore.lastReadNovelName &&
+    typeof readerStore.lastReadNovelName === 'object' &&
+    'value' in readerStore.lastReadNovelName &&
+    readerStore.lastReadNovelName.value
   ) {
-    await store.selectNovel(store.lastReadNovelName.value)
+    await readerStore.selectNovel(readerStore.lastReadNovelName.value)
   }
 })
 
 // 自动设置网页 title
 watch(
-  () => [store.currentNovel, store.chaptersMeta, store.currentChapterIndex],
+  () => [readerStore.currentNovel, readerStore.chaptersMeta, readerStore.currentChapterIndex],
   () => {
-    const novel = store.currentNovel || ''
-    const chapter = store.chaptersMeta?.[store.currentChapterIndex]?.title || ''
+    const novel = readerStore.currentNovel || ''
+    const chapter = readerStore.chaptersMeta?.[readerStore.currentChapterIndex]?.title || ''
     document.title = chapter ? `${novel} - ${chapter}` : novel
   },
   { immediate: true, deep: true }

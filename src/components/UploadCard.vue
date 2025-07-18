@@ -1,47 +1,35 @@
 <template>
-  <n-card title="上传小说">
-    <input
-      ref="fileInput"
-      type="file"
-      accept=".txt"
-      @change="handleUpload"
-      :disabled="uploading"
-      style="display: none"
-    />
-    <n-button
-      type="primary"
-      @click="triggerUpload"
-      :loading="uploading"
-      :disabled="uploading"
-    >
+  <n-upload
+    :custom-request="customRequest"
+    :show-file-list="false"
+    accept=".txt"
+    :disabled="uploading"
+  >
+    <n-button type="primary" :loading="uploading" :disabled="uploading">
       选择文件上传
     </n-button>
-    <n-spin v-if="uploading" size="small" class="ml-2">上传中...</n-spin>
-  </n-card>
+  </n-upload>
+  <n-spin v-if="uploading" size="small" class="ml-2">上传中...</n-spin>
 </template>
 
 <script setup>
-
-const store = useNovelStore()
+const libraryStore = useLibraryStore()
+const readerStore = useReaderStore()
 
 const uploading = ref(false)
-const fileInput = ref(null)
 
-function triggerUpload() {
-  fileInput.value && fileInput.value.click()
-}
-
-async function handleUpload(e) {
-  const file = e.target.files[0]
-  if (!file) return
-  uploading.value = true
-  const reader = new FileReader()
-  reader.onload = async (evt) => {
-    const content = evt.target.result
-    await store.uploadNovel(content, file.name)
+async function customRequest({ file, onFinish, onError }) {
+  const rawFile = file.file || file
+  try {
+    const content = await rawFile.text()
+    await libraryStore.uploadNovel(content, rawFile.name)
+    await readerStore.selectNovel(rawFile.name)
+    onFinish()
+  } catch (e) {
+    onError()
+  } finally {
     uploading.value = false
   }
-  reader.readAsText(file)
 }
 </script>
 
