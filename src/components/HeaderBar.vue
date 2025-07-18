@@ -1,13 +1,13 @@
 <template>
   <n-layout-header>
-    <n-space align="center" justify="space-between" class="w-full px-4 ">
-      <div class="flex items-center" style="height: 45px;">
+    <div class="w-full flex justify-between items-center px-4 h-[45px]">
+      <div class="flex items-center">
         <n-icon size="24">
           <BookOutline />
         </n-icon>
         <span class="ml-2 font-bold text-lg">read-novel</span>
       </div>
-      <div v-if="store.uploaded" style="display:flex; align-items:center; gap: 16px;">
+      <div v-if="store.uploaded" class="flex items-center gap-4">
         <div>
           <template v-if="!editingName">
             <span style="font-weight:bold; cursor:pointer;" @click="editingName = true">{{ store.currentNovel }}</span>
@@ -30,7 +30,7 @@
         >
         </n-progress>
       </div>
-      <div>
+      <div class="flex gap-4 items-center">
         <n-button quaternary circle @click="store.toggleTheme">
           <n-icon>
             <MoonOutline v-if="!store.isDark" />
@@ -43,7 +43,7 @@
           </n-icon>
         </n-button>
       </div>
-    </n-space>
+    </div>
   </n-layout-header>
 </template>
 
